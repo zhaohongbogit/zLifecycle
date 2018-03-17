@@ -4,10 +4,13 @@ import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 
 import java.util.List;
 
+import tk.hongbo.zlifecycle.AppApplication;
+import tk.hongbo.zlifecycle.dao.AppDatabase;
 import tk.hongbo.zlifecycle.dao.entity.User;
 
 /**
@@ -15,10 +18,12 @@ import tk.hongbo.zlifecycle.dao.entity.User;
  */
 public class UserViewModel extends AndroidViewModel {
 
-    LiveData<List<User>> users;
+    AppDatabase db;
+    MutableLiveData<List<User>> users;
 
     public UserViewModel(@NonNull Application application) {
         super(application);
+        this.db = ((AppApplication) getApplication()).getDb();
     }
 
     public LiveData<List<User>> getUsers() {
@@ -29,7 +34,39 @@ public class UserViewModel extends AndroidViewModel {
         return users;
     }
 
-    private void loadUsers(){
+    private void loadUsers() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                users.postValue(db.userDao().getAll());
+                return null;
+            }
+        }.execute();
+    }
 
+    public void addData() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                User user = new User();
+                user.firstName = "HONGBO";
+                user.lastName = "ZHAO";
+                db.userDao().insertAll(user);
+                loadUsers();
+                return null;
+            }
+        }.execute();
+    }
+
+    public void deletaData() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... voids) {
+                List<User> data = db.userDao().getAll();
+                db.userDao().delete(data.get(data.size() - 1));
+                loadUsers();
+                return null;
+            }
+        }.execute();
     }
 }

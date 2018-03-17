@@ -12,7 +12,7 @@ import android.graphics.Bitmap;
 @Entity
 public class User {
 
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     public int uid;
 
     @ColumnInfo(name = "first_name")
