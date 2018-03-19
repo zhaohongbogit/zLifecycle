@@ -44,13 +44,13 @@ public class UserViewModel extends AndroidViewModel {
         }.execute();
     }
 
-    public void addData() {
+    public void addData(String msg) {
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
                 User user = new User();
                 user.firstName = "HONGBO";
-                user.lastName = "ZHAO";
+                user.lastName = "ZHAO " + msg;
                 db.userDao().insertAll(user);
                 loadUsers();
                 return null;
